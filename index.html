@@ -5,35 +5,309 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Zyxx | Zaidan Rezkyando</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <link rel="stylesheet" href="public/tools/fontawesome-free-6.7.2-web/css/all.css">
+
+        <style>
+            .dynamic-text {
+                display: inline-block;
+                position: relative;
+                border-right: 4px solid currentColor;
+                white-space: nowrap;
+                overflow: hidden;
+                vertical-align: -0.12em;
+                padding-bottom: 0.12em;
+                animation: 
+                    typing-width 12s infinite,
+                    cursor-blink 0.8s step-end infinite;
+            }
+
+            .dynamic-text::after {
+                content: "";
+                animation: word-change-content 12s infinite;
+            }
+
+            @keyframes cursor-blink {
+                from, to { border-color: transparent }
+                50% { border-color: currentColor; }
+            }
+
+            @keyframes typing-width {
+                /* Word 1: Programmer (10 chars -> 11.5ch safety width) */
+                0% { width: 0; animation-timing-function: steps(11, end); }
+                5% { width: 11.5ch; }
+                25% { width: 11.5ch; animation-timing-function: steps(11, end); }
+                30%, 33.33% { width: 0; }
+
+                /* Word 2: Web Developer (13 chars -> 14.5ch safety width) */
+                33.34% { width: 0; animation-timing-function: steps(14, end); }
+                38.34% { width: 14.5ch; }
+                58.34% { width: 14.5ch; animation-timing-function: steps(14, end); }
+                63.34%, 66.66% { width: 0; }
+
+                /* Word 3: App Developer (13 chars -> 14.5ch safety width) */
+                66.67% { width: 0; animation-timing-function: steps(14, end); }
+                71.67% { width: 14.5ch; }
+                91.67% { width: 14.5ch; animation-timing-function: steps(14, end); }
+                96.67%, 100% { width: 0; }
+            }
+
+            @keyframes word-change-content {
+                0%, 33.33% { content: "Programmer"; }
+                33.34%, 66.66% { content: "Web Developer"; }
+                66.67%, 100% { content: "App Developer"; }
+            }
+
+            audio::-webkit-media-controls-enclosure {
+                background-color: transparent !important;
+                padding: 0;
+                margin: 0;
+            }
+
+            .music-section {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+                pointer-events: none;
+                transition: all 0.3s ease-in-out;
+            }
+
+            .music-section.active {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                pointer-events: auto;
+            }
+        </style>
     </head>
-    <body>
-        <header class="header">
-            <nav class="navbar-nav">
+    <body class="flex w-full min-h-screen flex-col box-border overflow-x-hidden">
+        <header class="header w-full flex z-999">
+            <nav class="navbar-nav w-full h-[90px] flex justify-between items-center px-10 bg-gray-100 shadow-lg">
                 <!-- logo and name -->
-                <div class="logo">
-                    <img src="#" alt="Logo Zyxx">
-                    <h1>Zaidan <span>Rezkyando</span></h1>
+                <div class="logo flex justify-between items-center gap-3">
+                    <img src="public/image/Logo-Zyxx.png" alt="Logo Zyxx" class="w-20">
+                    <h1 class="font-bold text-3xl">Zaidan <span class="text-purple-800">Rezkyando</span></h1>
                 </div>
 
                 <!-- navigasi halaman -->
-                 <div class="navigasi-halaman">
-                    <a href="#">Home</a>
-                    <a href="#">My Skill</a>
-                    <a href="#">About Me</a>
-                    <a href="#">Contact Me</a>
+                 <div class="navigasi-halaman flex justify-between items-center gap-6 text-lg font-semibold">
+                    <a href="#" class="hover:text-purple-800 hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer">Home</a>
+                    <a href="#" class="hover:text-purple-800 hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer">My Skill</a>
+                    <a href="#" class="hover:text-purple-800 hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer">About Me</a>
+                    <a href="#" class="hover:text-purple-800 hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer">Project</a>
+                    <a href="#" class="hover:text-purple-800 hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer">Contact Me</a>
                  </div>
 
                  <!-- button interaksi -->
-                  <div class="button-interaksi">
-                    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M600-640 480-760l120-120 120 120-120 120Zm200 120-80-80 80-80 80 80-80 80ZM483-80q-84 0-157.5-32t-128-86.5Q143-253 111-326.5T79-484q0-146 93-257.5T409-880q-18 99 11 193.5T520-521q71 71 165.5 100T879-410q-26 144-138 237T483-80Zm0-80q88 0 163-44t118-121q-86-8-163-43.5T463-465q-61-61-97-138t-43-163q-77 43-120.5 118.5T159-484q0 135 94.5 229.5T483-160Zm-20-305Z"/></svg></a>
+                  <div class="button-interaksi flex items-center gap-3">
+                    <a id="music-toggle-btn" href="#" class="w-10 h-10 flex items-center justify-center text-gray-800 hover:text-white bg-transparent hover:bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="w-6 h-6" fill="currentColor">
+                        <path d="M740-560h140v80h-80v220q0 42-29 71t-71 29q-42 0-71-29t-29-71q0-42 29-71t71-29q8 0 18 1.5t22 6.5v-208ZM120-160v-112q0-35 17.5-63t46.5-43q62-31 126-46.5T440-440q42 0 83.5 6.5T607-414q-20 12-36 29t-28 37q-26-6-51.5-9t-51.5-3q-57 0-112 14t-108 40q-9 5-14.5 14t-5.5 20v32h321q2 20 9.5 40t20.5 40H120Zm207-367q-47-47-47-113t47-113q47-47 113-47t113 47q47 47 47 113t-47 113q-47 47-113 47t-113-47Zm169.5-56.5Q520-607 520-640t-23.5-56.5Q473-720 440-720t-56.5 23.5Q360-673 360-640t23.5 56.5Q407-560 440-560t56.5-23.5ZM440-640Zm0 400Z"/>
+                      </svg>
+                    </a>
+
+                    <a href="#" class="w-10 h-10 flex items-center justify-center text-gray-800 hover:text-white bg-transparent hover:bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="w-6 h-6" fill="currentColor">
+                        <path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z"/>
+                      </svg>
+                    </a>
                   </div>
             </nav>
         </header>
 
-        <main>
-            <div class="section-home"></div>
+        <main class="flex justify-center items-center w-full flex-col relative">
+
+            <div class="music-section absolute z-99999 top-10 right-10" id="music">
+                <div class="container music flex flex-col bg-white/10 backdrop-blur-lg rounded-xl justify-center items-center gap-4 p-1 w-105">
+                    <div class="music-card flex justify-center items-center gap-4">
+                        <div class="song-image overflow-hidden rounded-lg ">
+                            <img src="public/image/Song-img/Tulus-image.png" alt="Song Image" class="w-20 h-20">
+                        </div>
+
+                        <div class="content-music flex flex-col justify-center">
+                            <div class="song-info ml-5">
+                                <h2 class="song-name text-lg font-semibold">Jatuh Suka</h2>
+                                <p class="song-artist text-sm text-gray-600">TULUS</p>
+                            </div>
+
+                            <div class="song-controls">
+                                <audio controls class="bg-transparent">
+                                    <source src="public/music/TULUS - Jatuh Suka (Official Lyric Video).mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="music-card flex justify-center items-center gap-4">
+                        <div class="song-image overflow-hidden rounded-lg ">
+                            <img src="public/image/Song-img/AzizHendra-SombodyPleasurEztendedVersion.png" alt="Song Image" class="w-20 h-20">
+                        </div>
+
+                        <div class="content-music flex flex-col justify-center">
+                            <div class="song-info ml-5">
+                                <h2 class="song-name text-lg font-semibold">Somebody Pleasure</h2>
+                                <p class="song-artist text-sm text-gray-600">Aziz Hendra</p>
+                            </div>
+
+                            <div class="song-controls">
+                                <audio controls class="bg-transparent">
+                                    <source src="public/music/Aziz Hedra - Somebodys Pleasure (Extended Version) - Official Lyric Video.mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="music-card flex justify-center items-center gap-4">
+                        <div class="song-image overflow-hidden rounded-lg ">
+                            <img src="public/image/Song-img/Tulus-image.png" alt="Song Image" class="w-20 h-20">
+                        </div>
+
+                        <div class="content-music flex flex-col justify-center">
+                            <div class="song-info ml-5">
+                                <h2 class="song-name text-lg font-semibold">Interaksi</h2>
+                                <p class="song-artist text-sm text-gray-600">TULUS</p>
+                            </div>
+
+                            <div class="song-controls">
+                                <audio controls class="bg-transparent">
+                                    <source src="public/music/TULUS - Interaksi (Official Lyric Video).mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="music-card flex justify-center items-center gap-4">
+                        <div class="song-image overflow-hidden rounded-lg ">
+                            <img src="public/image/Song-img/AminPalingSerius.jpg" alt="Song Image" class="w-20 h-20">
+                        </div>
+
+                        <div class="content-music flex flex-col justify-center">
+                            <div class="song-info ml-5">
+                                <h2 class="song-name text-lg font-semibold">Amin Paling Serius</h2>
+                                <p class="song-artist text-sm text-gray-600">Sal Priadi & Nadin Amizah</p>
+                            </div>
+
+                            <div class="song-controls">
+                                <audio controls class="bg-transparent">
+                                    <source src="public/music/Sal Priadi & Nadin Amizah - Amin Paling Serius (Official Audio).mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="section-home flex justify-between items-center px-20 w-full min-h-screen bg-[url('public/image/Bg-Zyxx.png')] bg-cover bg-center relative">
+
+                <div class="media-social absolute top-10 left-20 flex gap-4 ">
+                    <a href="" class="w-12 h-12 flex items-center justify-center text-white hover:text-white bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer"><i class="fa-brands fa-github text-2xl"></i></a>
+                    <a href="" class="w-12 h-12 flex items-center justify-center text-white hover:text-white bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer"><i class="fa-brands fa-instagram text-2xl"></i></a>
+                    <a href="" class="w-12 h-12 flex items-center justify-center text-white hover:text-white bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer"><i class="fa-brands fa-linkedin text-2xl"></i></a>
+                    <a href="" class="w-12 h-12 flex items-center justify-center text-white hover:text-white bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer"><i class="fa-brands fa-tiktok text-2xl"></i></a>
+                    <a href="" class="w-12 h-12 flex items-center justify-center text-white hover:text-white bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer"><i class="fa-brands fa-facebook text-2xl"></i></a>
+                    <a href="" class="w-12 h-12 flex items-center justify-center text-white hover:text-white bg-purple-800 rounded-full hover:scale-110 transition-all duration-300 ease-in-out cursor-pointer"><i class="fa-solid fa-envelope text-2xl"></i></a>
+                </div>
+
+                <div class="nama w-200 flex flex-col gap-2">
+                    <h3 class="text-purple-800 font-semibold text-2xl">Introduction</h3>
+                    <div class="my-skill flex gap-5">
+                        <h1 class="text-6xl font-black">I'm a <span class="text-purple-800 dynamic-text ml-4"></span></h1>
+                    </div>
+                    <h2 class="text-4xl font-bold">Zaidan <span class="text-purple-800">Rezkyando.</span></h2>
+                    <p>Hai, perkenalkan saya <span class="font-bold">Zaidan Rezkyando</span>, saya seorang <span class="font-bold">Web Developer</span> yang berpengalaman dalam pengembangan website. Saya memiliki keahlian dalam pengembangan website dan pengembangan aplikasi.</p>
+                    <button class="w-fit px-6 py-3 bg-purple-800 text-white font-semibold rounded-full px-8 shadow-lg hover:bg-purple-600 hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer mt-6 mb-6 flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M367-527q-47-47-47-113t47-113q47-47 113-47t113 47q47 47 47 113t-47 113q-47 47-113 47t-113-47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm296.5-343.5Q560-607 560-640t-23.5-56.5Q513-720 480-720t-56.5 23.5Q400-673 400-640t23.5 56.5Q447-560 480-560t56.5-23.5ZM480-640Zm0 400Z"/></svg>My Profil</button>
+                </div>
+
+                <div class="foto relative">
+                    <div class="absolute w-300 h-50 bg-purple-800 z-9 bottom-[-20px] rotate-[-15deg] left-[-15vw]"></div>
+                    <img src="public/image/Zaidan-Rezkyando (2).png" alt="Foto Divo Fajrinto" class="relative top-[-100px] left-[3px] z-8">
+                   <div class="absolute w-300 h-50 bg-purple-900 bottom-[150px] z-[7] rotate-[-30deg] left-[-15vw]"></div>
+                </div>
+            </div>
+
+            <div class="relative top-[-100px] section-project w-full min-h-screen flex bg-purple-800 z-99 w-full    ">
+                <div class="skill-content flex flex-col justify-center items-center m-15 mx-40 w-full">
+                    <div class="skill-container flex justify-between items-center gap-8 w-full h-fit">
+                        
+                        <div class="skill-card group cursor-pointer relative isolate w-[25vw] h-[60vh] rounded-[40px] shadow-2xl">
+                            <div class="logo p-4 absolute top-[-25px] left-1/2 -translate-x-1/2 z-99 bg-white shadow-2xl rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#4F00BC"><path d="M240-120q-45 0-89-22t-71-58q26 0 53-20.5t27-59.5q0-50 35-85t85-35q50 0 85 35t35 85q0 66-47 113t-113 47Zm0-80q33 0 56.5-23.5T320-280q0-17-11.5-28.5T280-320q-17 0-28.5 11.5T240-280q0 23-5.5 42T220-202q5 2 10 2h10Zm230-160L360-470l358-358q11-11 27.5-11.5T774-828l54 54q12 12 12 28t-12 28L470-360Zm-190 80Z"/></svg>
+                            </div>
+
+                            <div class="content relative overflow-hidden w-[25vw] h-[60vh] rounded-[40px]">
+                                <div class="img-skill absolute w-full h-full z-10">
+                                    <img src="public/image/gambar-skill.jpg" alt="Image skill gambar" class="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-[1.1]">
+                                </div>
+                            </div>
+
+                            <div class="deskripsi-singkat absolute bg-white rounded-[1.8rem] p-5 top-[70%] left-[1vw] w-120 z-99 shadow-xl ">
+                                <span class="flex gap-1 items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#03fc3d"><path d="M281.5-281.5Q200-363 200-480t81.5-198.5Q363-760 480-760t198.5 81.5Q760-597 760-480t-81.5 198.5Q597-200 480-200t-198.5-81.5Z"/></svg>
+                                    <h3 class="text-xl mb-2 text-purple-800 font-semibold">drawing skills</h3>
+                                </span>
+                                <p class="text-sm text-justify">Saya memiliki sebuah hobi menggambar yang dimana saya mendapatkan sebuah skill menggambar walaupun kemampuan saya masih dalam tahap berkembang dan saya harus labih banyak belajar lagi.</p>
+                                <button class="lihat-detail-gambar mt-5 bg-purple-800 text-white py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-purple-600 hover:scale-101 transition-all duration-300  ease-in-out cursor-pointer"><a href="#">See My arts</a></button>
+                            </div>
+
+                          <div class="rounded-[40px] w-full h-full absolute top-[20px] bg-purple-900 left-[-20px] -z-10"></div>
+                        </div>
+
+                        <div class="skill-card group cursor-pointer relative isolate w-[25vw] h-[60vh] rounded-[40px] shadow-2xl">
+                            <div class="logo p-4 absolute top-[-25px] left-1/2 -translate-x-1/2 z-99 bg-white shadow-2xl rounded-full">
+                               <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#4F00BC"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H160v400Zm140-40-56-56 103-104-104-104 57-56 160 160-160 160Zm180 0v-80h240v80H480Z"/></svg>
+                            </div>
+
+                            <div class="content relative overflow-hidden w-[25vw] h-[60vh] rounded-[40px]">
+                                <div class="img-skill absolute w-full h-full z-10">
+                                    <img src="public/image/gambar-coding.jpg" alt="Image skill gambar" class="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-[1.1]">
+                                </div>
+                            </div>
+                            
+                            <div class="deskripsi-singkat absolute bg-white rounded-[1.8rem] p-5 top-[70%] left-[1vw] w-120 z-99 shadow-xl ">
+                                <span class="flex gap-1 items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#03fc3d"><path d="M281.5-281.5Q200-363 200-480t81.5-198.5Q363-760 480-760t198.5 81.5Q760-597 760-480t-81.5 198.5Q597-200 480-200t-198.5-81.5Z"/></svg>
+                                    <h3 class="text-xl mb-2 text-purple-800 font-semibold">coding skills</h3>
+                                </span>
+                                <p class="text-sm text-justify">Saya memiliki sebuah ilmu yang saya pelajari selama barada di smk dan saya mendapatkan ilmu coding dan saya akan terus mengembangkan ilmu coding saya.</p>
+                                <button class="lihat-detail-gambar mt-5 bg-purple-800 text-white py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-purple-600 hover:scale-101 transition-all duration-300  ease-in-out cursor-pointer"><a href="#">See My projects</a></button>
+                            </div>
+
+                          <div class="rounded-[40px] w-full h-full absolute top-[20px] bg-purple-900 left-[-20px] -z-10"></div>
+                        </div>
+
+
+                        <div class="skill-card group cursor-pointer relative isolate w-[25vw] h-[60vh] rounded-[40px] shadow-2xl">
+                            <div class="logo p-4 absolute top-[-25px] left-1/2 -translate-x-1/2 z-99 bg-white shadow-2xl rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#4F00BC"><path d="M240-120q-45 0-89-22t-71-58q26 0 53-20.5t27-59.5q0-50 35-85t85-35q50 0 85 35t35 85q0 66-47 113t-113 47Zm0-80q33 0 56.5-23.5T320-280q0-17-11.5-28.5T280-320q-17 0-28.5 11.5T240-280q0 23-5.5 42T220-202q5 2 10 2h10Zm230-160L360-470l358-358q11-11 27.5-11.5T774-828l54 54q12 12 12 28t-12 28L470-360Zm-190 80Z"/></svg>
+                            </div>
+
+                            <div class="content relative overflow-hidden w-[25vw] h-[60vh] rounded-[40px]">
+                                <div class="img-skill absolute w-full h-full z-10">
+                                    <img src="public/image/gambar-skill.jpg" alt="Image skill gambar" class="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-[1.1]">
+                                </div>
+                            </div>
+                            
+                            <div class="deskripsi-singkat absolute bg-white rounded-[1.8rem] p-5 top-[70%] left-[1vw] w-120 z-99 shadow-xl ">
+                                <span class="flex gap-1 items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#03fc3d"><path d="M281.5-281.5Q200-363 200-480t81.5-198.5Q363-760 480-760t198.5 81.5Q760-597 760-480t-81.5 198.5Q597-200 480-200t-198.5-81.5Z"/></svg>
+                                    <h3 class="text-xl mb-2 text-purple-800 font-semibold">drawing skills</h3>
+                                </span>
+                                <p class="text-sm text-justify">Saya memiliki sebuah hobi menggambar yang dimana saya mendapatkan sebuah skill menggambar walaupun kemampuan saya masih dalam tahap berkembang dan saya harus labih banyak belajar lagi.</p>
+                                <button class="lihat-detail-gambar mt-5 bg-purple-800 text-white py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-purple-600 hover:scale-101 transition-all duration-300  ease-in-out cursor-pointer"><a href="#">See My arts</a></button>
+                            </div>
+
+                          <div class="rounded-[40px] w-full h-full absolute top-[20px] bg-purple-900 left-[-20px] -z-10"></div>
+                        </div>
+
+
+                        
+                    </div>
+                </div>
+            </div>
         </main>
 
-        <script src="js/script.js"></script>
+        <footer>
+            
+        </footer>
+
+        <script src="public/js/script.js"></script>
     </body>
     </html>
